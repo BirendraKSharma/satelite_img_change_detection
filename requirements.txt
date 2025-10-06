@@ -1,0 +1,14 @@
+rasterio
+numpy
+matplotlib
+scikit-image
+opencv-python
+streamlit
+plotly
+pandas
+Pillow
+scipy
+earthpy
+geopandas
+folium
+streamlit-folium
