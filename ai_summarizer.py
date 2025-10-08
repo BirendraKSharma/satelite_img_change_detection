@@ -35,7 +35,7 @@ Total Pixels Analyzed: {stats.get('total_pixels', 0):,}
 Changed Pixels: {stats.get('changed_pixels', 0):,}
 Change Percentage: {stats.get('change_percentage', 0):.2f}%
 Number of Change Regions: {stats.get('num_change_regions', 0)}
-Average Region Size: {stats.get('avg_region_size', 0):.1f} pixels
+Average Region Size: {stats.get('mean_region_size', 0):.1f} pixels
 
 Provide a professional summary that:
 1. Describes the magnitude of change (minor, moderate, significant, dramatic)

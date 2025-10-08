@@ -515,7 +515,7 @@ with tab1:
                                 fig4, ax4 = plt.subplots(figsize=(10, 8))
                                 im = ax4.imshow(change_map, cmap='RdYlGn_r', interpolation='nearest')
                                 ax4.axis('off')
-                                ax4.set_title("White = Changed, Black = Unchanged", fontsize=12)
+                                ax4.set_title("Red = Changed, Green = Unchanged", fontsize=12)
                                 plt.colorbar(im, ax=ax4)
                                 st.pyplot(fig4)
                                 plt.close()
