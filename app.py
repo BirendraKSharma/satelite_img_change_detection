@@ -12,14 +12,12 @@ from plotly.subplots import make_subplots
 import pandas as pd
 from pathlib import Path
 import rasterio
-from rasterio.io import MemoryFile
 from change_detector import ChangeDetector
 import cv2
 from datetime import datetime
 import tempfile
 import io
 from typing import List, Dict, Tuple
-import base64
 
 # Page configuration
 st.set_page_config(
@@ -29,7 +27,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS
+# Simple styling
 st.markdown("""
     <style>
     .main-header {
@@ -38,53 +36,6 @@ st.markdown("""
         color: #1f77b4;
         text-align: center;
         padding: 1rem;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #2c3e50;
-        margin-top: 1rem;
-        border-bottom: 2px solid #667eea;
-        padding-bottom: 0.5rem;
-    }
-    .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1rem;
-        border-radius: 0.5rem;
-        margin: 0.5rem 0;
-        color: white;
-    }
-    .upload-section {
-        background-color: #f8f9fa;
-        padding: 2rem;
-        border-radius: 10px;
-        border: 2px dashed #667eea;
-        margin: 1rem 0;
-    }
-    .image-card {
-        background-color: white;
-        padding: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        margin: 0.5rem;
-    }
-    .stButton>button {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 0.5rem 2rem;
-        border-radius: 5px;
-        font-weight: bold;
-    }
-    .success-box {
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-        color: #155724;
-        padding: 1rem;
-        border-radius: 5px;
-        margin: 1rem 0;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -219,21 +170,57 @@ if upload_mode == "Upload Files":
 
 else:  # Use existing files
     current_dir = Path(__file__).parent
-    tif_files = sorted(list(current_dir.glob("*.tif")) + list(current_dir.glob("*.tiff")))
+    
+    # Search in both current directory and sample_images subdirectory
+    tif_files = []
+    tif_files.extend(current_dir.glob("*.tif"))
+    tif_files.extend(current_dir.glob("*.tiff"))
+    
+    # Also check sample_images directory
+    sample_dir = current_dir / "sample_images"
+    if sample_dir.exists():
+        tif_files.extend(sample_dir.glob("*.tif"))
+        tif_files.extend(sample_dir.glob("*.tiff"))
+    
+    tif_files = sorted(tif_files)
     
     if tif_files:
         st.sidebar.markdown("##### 📂 Available Files")
-        for tif_file in tif_files:
-            if st.sidebar.button(f"➕ {tif_file.name}", key=f"add_{tif_file.name}"):
-                if not any(img['name'] == tif_file.name for img in st.session_state.image_metadata):
-                    file_path = str(tif_file)
-                    metadata = get_image_info(file_path)
-                    
-                    st.session_state.uploaded_images.append(file_path)
-                    st.session_state.image_metadata.append(metadata)
-                    st.sidebar.success(f"✅ Added: {tif_file.name}")
-                else:
-                    st.sidebar.warning(f"Already added: {tif_file.name}")
+        
+        # Group files by location for better organization
+        root_files = [f for f in tif_files if f.parent == current_dir]
+        sample_files = [f for f in tif_files if f.parent != current_dir]
+        
+        # Display files from sample_images first (professional dataset)
+        if sample_files:
+            st.sidebar.markdown("**🌍 Professional Dataset (Onera):**")
+            for tif_file in sample_files:
+                if st.sidebar.button(f"➕ {tif_file.name}", key=f"add_{tif_file.name}"):
+                    if not any(img['name'] == tif_file.name for img in st.session_state.image_metadata):
+                        file_path = str(tif_file)
+                        metadata = get_image_info(file_path)
+                        
+                        st.session_state.uploaded_images.append(file_path)
+                        st.session_state.image_metadata.append(metadata)
+                        st.sidebar.success(f"✅ Added: {tif_file.name}")
+                    else:
+                        st.sidebar.warning(f"Already added: {tif_file.name}")
+        
+        # Display files from root directory
+        if root_files:
+            if sample_files:  # Add separator if we showed sample files
+                st.sidebar.markdown("**📁 Root Directory:**")
+            for tif_file in root_files:
+                if st.sidebar.button(f"➕ {tif_file.name}", key=f"add_{tif_file.name}"):
+                    if not any(img['name'] == tif_file.name for img in st.session_state.image_metadata):
+                        file_path = str(tif_file)
+                        metadata = get_image_info(file_path)
+                        
+                        st.session_state.uploaded_images.append(file_path)
+                        st.session_state.image_metadata.append(metadata)
+                        st.sidebar.success(f"✅ Added: {tif_file.name}")
+                    else:
+                        st.sidebar.warning(f"Already added: {tif_file.name}")
     else:
         st.sidebar.warning("No TIF files found in directory")
 
