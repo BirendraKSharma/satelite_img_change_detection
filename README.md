@@ -72,21 +72,24 @@ This system analyzes satellite images to detect and visualize changes between tw
 
 # Create virtual environment```bash
 
-python -m venv .venv# Create virtual environment
 
-source .venv/bin/activate  # On Windows: .venv\Scripts\activatepython -m venv .venv
+# Create virtual environment
+python -m venv .venv
+or
+uv venv --seed
+## For activation
+
+# Mac/Linux: source .venv/bin/activate  
+# On Windows: .venv\Scripts\activate
 
 
 
-# Install packages# Activate environment
+# Install packages
 
-pip install -r requirements.txt# Windows:
+(uv) pip install -r requirements.txt
 
-```.venv\Scripts\activate
 
-# Linux/Mac:
-
-### 2. Configure API Key (Optional)source .venv/bin/activate
+### 2. Configure API Key (Optional)s
 
 For AI-powered summaries:
 
@@ -100,15 +103,16 @@ For AI-powered summaries:
 
 ### 3. Run Application### 2. Run the Application
 
-```bash```bash
+```bash
 
-streamlit run app.pystreamlit run app.py
+streamlit run app.py
 
-``````
+```
 
 
 
-Open browser at `http://localhost:8501`The dashboard will open in your browser at `http://localhost:8501`
+Open browser at `http://localhost:8501`
+The dashboard will open in your browser at `http://localhost:8501`
 
 
 
@@ -159,36 +163,6 @@ Satelite_Image_detection/3. **Select Comparison**: Choose "Earlier Image" and "L
 6. View results and export dataSee [API_KEY_SETUP.md](API_KEY_SETUP.md) for detailed instructions.
 
 
-
-### Via Python Script## 📁 Project Structure
-
-```python
-
-from change_detector import ChangeDetector```
-
-Satelite_Image_detection/
-
-# Initialize detector├── app.py                          # Main Streamlit dashboard
-
-detector = ChangeDetector('image_before.tif', 'image_after.tif')├── change_detector.py              # Core change detection algorithms
-
-detector.load_images()├── ai_summarizer.py                # AI-powered natural language summary
-
-├── example_usage.py                # Python script usage example
-
-# Run detection├── requirements.txt                # Python dependencies
-
-change_map = detector.detect_changes_threshold(threshold=0.15)├── .env.example                    # Environment variables template
-
-stats = detector.analyze_change_statistics(change_map)├── .env                            # Your API keys (create from .env.example)
-
-├── README.md                       # This file
-
-print(f"Changed area: {stats['change_percentage']:.2f}%")├── API_KEY_SETUP.md                # Detailed API key setup guide
-
-```└── sample_images/                  # Sample satellite data
-
-```
 
 ## 🛠️ Technologies Used
 
@@ -268,9 +242,7 @@ from change_detector import ChangeDetector
 
 - **📈 Statistics Tab**: Detailed metrics and chartsdetector = ChangeDetector(
 
-- **🤖 AI Summary**: Natural language insights    'snapshot-2025-10-01T00_00_00Z.tif',
-
-    'snapshot-2025-10-06T00_00_00Z.tif'
+- **🤖 AI Summary**: Natural language insights kathmandu_before.tif kathmandu_after.tif
 
 ## 🔒 Security)
 
@@ -320,17 +292,10 @@ print(f"Changed pixels: {stats['changed_pixels']:,}")
 
 ## 📦 Requirements
 
-### Common Issues
 
 - Python 3.8+
 
-- 4GB RAM minimum**"streamlit: command not found"**
-
-- Modern web browser```bash
-
-pip install streamlit
-
----```
+- 4GB RAM minimum
 
 
 

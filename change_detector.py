@@ -1,15 +1,8 @@
-"""
-Satellite Image Change Detection Module
-Analyzes temporal changes in satellite imagery
-"""
-
 import rasterio
 import numpy as np
 from skimage import filters, morphology
-from skimage.metrics import structural_similarity as ssim
 from scipy import ndimage
-import cv2
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -307,7 +300,6 @@ class ChangeDetector:
                 rgb = np.stack([gray, gray, gray], axis=2)
             return rgb
         
-        rgb1 = create_rgb(img1_norm)
         rgb2 = create_rgb(img2_norm)
         
         # Create change overlay (red for changes)

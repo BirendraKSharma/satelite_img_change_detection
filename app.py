@@ -1,24 +1,15 @@
-"""
-Enhanced Streamlit BI Dashboard for Satellite Image Change Detection
-Real-time image upload and analysis with advanced UI
-"""
-
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
 import pandas as pd
 from pathlib import Path
 import rasterio
 from change_detector import ChangeDetector
 from ai_summarizer import generate_summary, get_quick_insight
-import cv2
 from datetime import datetime
 import tempfile
-import io
-from typing import List, Dict, Tuple
+from typing import Dict
 import os
 from dotenv import load_dotenv
 
@@ -315,7 +306,6 @@ if len(st.session_state.uploaded_images) >= 2:
     
     show_overlay = st.sidebar.checkbox("Show Change Overlay", value=True)
     show_heatmap = st.sidebar.checkbox("Show Intensity Heatmap", value=True)
-    show_statistics = st.sidebar.checkbox("Show Detailed Statistics", value=True)
     
     # Analysis button
     st.sidebar.markdown("---")
@@ -333,7 +323,6 @@ tab1, tab2, tab3 = st.tabs(["📊 Analysis", "🖼️ Image Gallery", "📈 Stat
 # Tab 1: Analysis
 with tab1:
     if len(st.session_state.uploaded_images) == 0:
-        st.markdown('<div class="upload-section">', unsafe_allow_html=True)
         st.markdown("### 👈 Get Started")
         st.markdown("""
         **Step 1:** Upload satellite images using the sidebar or use existing files  
@@ -346,7 +335,6 @@ with tab1:
         - Multi-band satellite imagery
         - NASA satellite data
         """)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     elif len(st.session_state.uploaded_images) < 2:
         st.warning("⚠️ Please add at least 2 images to perform change detection analysis.")
@@ -415,8 +403,7 @@ with tab1:
                     
                     # Display results
                     st.markdown("---")
-                    st.markdown('<div class="sub-header">📊 Key Performance Indicators</div>', 
-                               unsafe_allow_html=True)
+                    st.markdown("### 📊 Key Performance Indicators")
                     
                     col1, col2, col3, col4 = st.columns(4)
                     
@@ -451,8 +438,7 @@ with tab1:
                     # AI-Powered Summary
                     if enable_ai_summary:
                         st.markdown("---")
-                        st.markdown('<div class="sub-header">🤖 AI-Powered Insight</div>', 
-                                   unsafe_allow_html=True)
+                        st.markdown("### 🤖 AI-Powered Insight")
                         
                         with st.spinner("🔄 Generating natural language summary..."):
                             summary = generate_summary(stats, detection_method, gemini_api_key)
@@ -466,8 +452,7 @@ with tab1:
                     
                     # Visualizations
                     st.markdown("---")
-                    st.markdown('<div class="sub-header">🗺️ Change Detection Visualizations</div>', 
-                               unsafe_allow_html=True)
+                    st.markdown("### 🗺️ Change Detection Visualizations")
                     
                     # Get normalized images for display
                     img1_norm, img2_norm = detector.normalize_images()
@@ -550,8 +535,7 @@ with tab1:
                     # Vegetation analysis
                     if veg_results and detection_method == "Vegetation Analysis":
                         st.markdown("---")
-                        st.markdown('<div class="sub-header">🌿 Vegetation Change Analysis</div>', 
-                                   unsafe_allow_html=True)
+                        st.markdown("### 🌿 Vegetation Change Analysis")
                         
                         col1, col2, col3 = st.columns(3)
                         
@@ -602,8 +586,7 @@ with tab1:
                     
                     # Export section
                     st.markdown("---")
-                    st.markdown('<div class="sub-header">💾 Export Results</div>', 
-                               unsafe_allow_html=True)
+                    st.markdown("### 💾 Export Results")
                     
                     col1, col2 = st.columns(2)
                     
@@ -640,7 +623,7 @@ with tab1:
 
 # Tab 2: Image Gallery
 with tab2:
-    st.markdown('<div class="sub-header">🖼️ Image Gallery</div>', unsafe_allow_html=True)
+    st.markdown("### 🖼️ Image Gallery")
     
     if len(st.session_state.uploaded_images) == 0:
         st.info("No images loaded yet. Upload images using the sidebar.")
@@ -653,8 +636,6 @@ with tab2:
                 idx = i + j
                 if idx < len(st.session_state.uploaded_images):
                     with col:
-                        st.markdown(f'<div class="image-card">', unsafe_allow_html=True)
-                        
                         # Image preview
                         thumbnail = create_thumbnail(st.session_state.uploaded_images[idx])
                         fig, ax = plt.subplots(figsize=(6, 6))
@@ -671,15 +652,13 @@ with tab2:
                         st.text(f"Type: {metadata['dtype']}")
                         
                         # Remove button
-                        if st.button(f"🗑️ Remove", key=f"remove_{idx}"):
+                        if st.button("🗑️ Remove", key=f"remove_{idx}"):
                             remove_image(idx)
                             st.rerun()
-                        
-                        st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 3: Statistics
 with tab3:
-    st.markdown('<div class="sub-header">📈 Detailed Statistics</div>', unsafe_allow_html=True)
+    st.markdown("### 📈 Detailed Statistics")
     
     if st.session_state.analysis_results:
         stats = st.session_state.analysis_results['stats']

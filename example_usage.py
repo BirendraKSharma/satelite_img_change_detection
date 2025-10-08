@@ -1,7 +1,3 @@
-"""
-Simple example of satellite image change detection
-"""
-
 from change_detector import ChangeDetector
 
 def main():
