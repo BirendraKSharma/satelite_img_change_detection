@@ -8,3 +8,5 @@ plotly
 pandas
 Pillow
 scipy
+google-generativeai
+python-dotenv

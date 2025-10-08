@@ -13,11 +13,17 @@ import pandas as pd
 from pathlib import Path
 import rasterio
 from change_detector import ChangeDetector
+from ai_summarizer import generate_summary, get_quick_insight
 import cv2
 from datetime import datetime
 import tempfile
 import io
 from typing import List, Dict, Tuple
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Page configuration
 st.set_page_config(
@@ -136,6 +142,30 @@ st.markdown("### Real-Time Business Intelligence Dashboard for Environmental Mon
 
 # Sidebar
 st.sidebar.title("🔧 Configuration")
+st.sidebar.markdown("---")
+
+# AI Summary Configuration
+st.sidebar.subheader("🤖 AI Summary")
+
+# Try to load API key from .env file first
+default_api_key = os.getenv('GEMINI_API_KEY', '')
+
+gemini_api_key = st.sidebar.text_input(
+    "Google AI API Key",
+    value=default_api_key,
+    type="password",
+    help="Get your free API key from https://makersuite.google.com/app/apikey or set GEMINI_API_KEY in .env file",
+    placeholder="Enter your Gemini API key or add to .env..."
+)
+
+if default_api_key:
+    st.sidebar.caption("✅ API key loaded from .env file")
+
+enable_ai_summary = st.sidebar.checkbox(
+    "Enable AI Summary",
+    value=bool(default_api_key),  # Auto-enable if key exists in .env
+    help="Generate natural language summary of results"
+)
 st.sidebar.markdown("---")
 
 # Image Management Section
@@ -417,6 +447,22 @@ with tab1:
                             value=f"{stats['mean_region_size']:.0f}",
                             delta="pixels"
                         )
+                    
+                    # AI-Powered Summary
+                    if enable_ai_summary:
+                        st.markdown("---")
+                        st.markdown('<div class="sub-header">🤖 AI-Powered Insight</div>', 
+                                   unsafe_allow_html=True)
+                        
+                        with st.spinner("🔄 Generating natural language summary..."):
+                            summary = generate_summary(stats, detection_method, gemini_api_key)
+                        
+                        # Display summary in a nice box
+                        st.info(f"**📝 Summary:**\n\n{summary}")
+                        
+                        # Quick insight (no API needed)
+                        quick_insight = get_quick_insight(stats['change_percentage'])
+                        st.caption(f"**Quick Insight:** {quick_insight}")
                     
                     # Visualizations
                     st.markdown("---")
